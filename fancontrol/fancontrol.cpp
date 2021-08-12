@@ -45,7 +45,24 @@ FANCONTROL::FANCONTROL(HINSTANCE hinstapp)
 		ReadErrorCount(0),
 		MaxReadErrors(10),
 		NoBallons(0),
-		Hotkeys(0),
+		HK_BIOS_Method(0),
+		HK_BIOS(0),
+		HK_Manual_Method(0),
+		HK_Manual(0),
+		HK_Smart_Method(0),
+		HK_Smart(0),
+		HK_SM1_Method(0),
+		HK_SM1(0),
+		HK_SM2_Method(0),
+		HK_SM2(0),
+		HK_TG_BS_Method(0),
+		HK_TG_BS(0),
+		HK_TG_BM_Method(0),
+		HK_TG_BM(0),
+		HK_TG_MS_Method(0),
+		HK_TG_MS(0),
+		HK_TG_12_Method(0),
+		HK_TG_12(0),
 		BluetoothEDR(0),
 		ManModeExit(80),
 		ManModeExit2(80),
@@ -69,6 +86,7 @@ FANCONTROL::FANCONTROL(HINSTANCE hinstapp)
         Runs_as_service(FALSE),
 		ActiveMode(false),
 		ManFanSpeed(7),
+		UseTWR(0),
 		FinalSeen(false),
 		m_fanTimer(NULL),
 		m_titleTimer(NULL),
@@ -337,7 +355,7 @@ FANCONTROL::FANCONTROL(HINSTANCE hinstapp)
 
 	if (this->hwndDialog) {
 		::GetWindowText(this->hwndDialog, this->Title, sizeof(this->Title));
-		strcat_s(this->Title,sizeof(this->Title), ".62");
+		strcat_s(this->Title,sizeof(this->Title), ".63 multiHotKey");
 		if (SlimDialog == 0) strcat_s(this->Title,sizeof(this->Title), this->Title3);
 		::SetWindowText(this->hwndDialog, this->Title);
 
@@ -404,13 +422,16 @@ FANCONTROL::FANCONTROL(HINSTANCE hinstapp)
 		this->ModeToDialog(this->CurrentMode);
 		this->PreviousMode= 1;
 
-		if (Hotkeys) {
-			RegisterHotKey(this->hwndDialog,1,MOD_CONTROL + MOD_SHIFT, 0x42); //0x42 is 'b'
-			RegisterHotKey(this->hwndDialog,2,MOD_CONTROL + MOD_SHIFT, 0x53); //0x53 is 's'
-			RegisterHotKey(this->hwndDialog,3,MOD_CONTROL + MOD_SHIFT, 0x4D); //0x4D is 'm'
-			RegisterHotKey(this->hwndDialog,4,MOD_CONTROL + MOD_SHIFT, 0x31); //0x31 is '1'
-			RegisterHotKey(this->hwndDialog,5,MOD_CONTROL + MOD_SHIFT, 0x32); //0x32 is '2'
-		}
+		if (HK_BIOS_Method) RegisterHotKey(this->hwndDialog,1,HK_BIOS_Method,HK_BIOS);
+		if (HK_Smart_Method) RegisterHotKey(this->hwndDialog,2,HK_Smart_Method,HK_Smart); 
+		if (HK_Manual_Method) RegisterHotKey(this->hwndDialog,3,HK_Manual_Method,HK_Manual);
+		if (HK_SM1_Method) RegisterHotKey(this->hwndDialog,4,HK_SM1_Method,HK_SM1); 
+		if (HK_SM2_Method) RegisterHotKey(this->hwndDialog,5,HK_SM2_Method,HK_SM2); 
+		if (HK_TG_BS_Method) RegisterHotKey(this->hwndDialog,6,HK_TG_BS_Method,HK_TG_BS); 
+		if (HK_TG_BM_Method) RegisterHotKey(this->hwndDialog,7,HK_TG_BM_Method,HK_TG_BM); 
+		if (HK_TG_MS_Method) RegisterHotKey(this->hwndDialog,8,HK_TG_MS_Method,HK_TG_MS); 
+		if (HK_TG_12_Method) RegisterHotKey(this->hwndDialog,9,HK_TG_12_Method,HK_TG_12); 
+		
 
 
 		// enable/disable mode radiobuttons
@@ -621,24 +642,30 @@ ULONG
 FANCONTROL::DlgProc(HWND hwnd, ULONG msg, WPARAM mp1, LPARAM mp2)
 {
 	ULONG rc= 0, ok, res;
+	char buf[1024];
+
 //	HANDLE hLockS = CreateMutex(NULL,FALSE,"TPFanControlMutex01");
 
 switch (msg) {
 
 		case WM_HOTKEY:
 			switch (mp1){
+
 		case 1:
 						this->ModeToDialog(1);
 						::PostMessage(this->hwndDialog, WM__GETDATA, 0, 0);
 				break;
+
 		case 2:
 							this->ModeToDialog(2);
 							::PostMessage(this->hwndDialog, WM__GETDATA, 0, 0);
 				break;
+
 		case 3:
 							this->ModeToDialog(3);
 							::PostMessage(this->hwndDialog, WM__GETDATA, 0, 0);
 				break;
+
 		case 4:
 									this->ModeToDialog(2);
 									if (this->IndSmartLevel == 1) {
@@ -652,6 +679,7 @@ switch (msg) {
 						}
 						::PostMessage(this->hwndDialog, WM__GETDATA, 0, 0);
 				break;
+
 		case 5:
 									this->ModeToDialog(2);
 									if (this->IndSmartLevel == 0) {
@@ -665,6 +693,60 @@ switch (msg) {
 						}
 						::PostMessage(this->hwndDialog, WM__GETDATA, 0, 0);	   
 				break;
+
+		case 6:
+			if (this->CurrentMode > 1) {
+				this->ModeToDialog(1);
+				::PostMessage(this->hwndDialog, WM__GETDATA, 0, 0);}
+													
+			if (this->CurrentMode == 1){
+				this->ModeToDialog(2);
+				::PostMessage(this->hwndDialog, WM__GETDATA, 0, 0);}
+			break;
+
+		case 7:
+			if (this->CurrentMode > 1) {
+				this->ModeToDialog(1);
+				::PostMessage(this->hwndDialog, WM__GETDATA, 0, 0);}								
+			if (this->CurrentMode == 1){
+				this->ModeToDialog(3);
+				::PostMessage(this->hwndDialog, WM__GETDATA, 0, 0);}
+			break;
+
+		case 8:
+			if (this->CurrentMode < 3) {
+				this->ModeToDialog(3);
+				::PostMessage(this->hwndDialog, WM__GETDATA, 0, 0);}						
+			if (this->CurrentMode == 3){
+				this->ModeToDialog(2);
+				::PostMessage(this->hwndDialog, WM__GETDATA, 0, 0);}
+			break;
+
+		case 9:
+			this->ModeToDialog(2);
+			switch (IndSmartLevel){
+		case 0:
+			sprintf_s(obuf, sizeof(obuf), "Activation of Fan Control Profile 'Smart Mode 2'");
+			this->Trace(obuf);
+			this->IndSmartLevel = 1;
+			for (int i= 0; i<32; i++) {
+				this->SmartLevels[i].temp = this->SmartLevels2[i].temp2; 
+				this->SmartLevels[i].fan = this->SmartLevels2[i].fan2;
+			}
+			::PostMessage(this->hwndDialog, WM__GETDATA, 0, 0);
+			break;
+		case 1: 
+			sprintf_s(obuf, sizeof(obuf), "Activation of Fan Control Profile 'Smart Mode 1'");
+			this->Trace(obuf);
+			this->IndSmartLevel = 0;
+			for (int i= 0; i<32; i++) {
+				this->SmartLevels[i].temp = this->SmartLevels1[i].temp1; 
+				this->SmartLevels[i].fan = this->SmartLevels1[i].fan1;
+			}
+			::PostMessage(this->hwndDialog, WM__GETDATA, 0, 0);
+			break;
+			}
+			break;
 			}
 
 		case WM_INITDIALOG:
@@ -1257,7 +1339,7 @@ switch (msg) {
 		case WM__NEWDATA:
 				if (this->hThread) {
 					::WaitForSingleObject(this->hThread, INFINITE);
-					::CloseHandle(this->hThread);
+					if (this->hThread) ::CloseHandle(this->hThread);
 					this->hThread= 0;
 				}
 
@@ -1273,16 +1355,20 @@ switch (msg) {
 					}
 				}
 				else {
-					this->Trace("Warning: Can't read Status (possible conflict with other software)");
+					sprintf_s(buf, sizeof(buf),"Warning: can't read Status, read error count = %d", this->ReadErrorCount);
+					this->Trace(buf);
+					sprintf_s(buf, sizeof(buf),"We will close to BIOS-Mode after %d consecutive read errors", this->MaxReadErrors);
+					this->Trace(buf);
 					this->ReadErrorCount++;
 
 					// after so many consecutive read errors, try to switch back to bios mode
-					if (this->ReadErrorCount>this->MaxReadErrors) {
+					if (this->ReadErrorCount > this->MaxReadErrors) {
 						this->ModeToDialog(1);
 						ok= this->SetFan("Max. Errors", 0x80);
 						if (ok) {
 							this->Trace("Set to BIOS Mode, to many consecutive read errors");
-							//	::SendMessage(this->hwndDialog, WM_CLOSE, 0, 0);
+							::Sleep(2000);
+							::SendMessage(this->hwndDialog, WM_ENDSESSION, 0, 0);
 						}
 					}
 				}

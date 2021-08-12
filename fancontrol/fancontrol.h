@@ -28,7 +28,7 @@
 
 
 
-#define FANCONTROLVERSION "0.62"
+#define FANCONTROLVERSION "0.63 multiHotKey"
 
 #define WM__DISMISSDLG WM_USER+5
 #define WM__GETDATA WM_USER+6
@@ -104,6 +104,7 @@ class FANCONTROL
 		int NoExtSensor;
 		int FanSpeedLowByte;
 		int ActiveMode,
+			UseTWR,
 			ManFanSpeed,
 			FinalSeen;
 		int CurrentMode, fanctrl2,
@@ -125,8 +126,25 @@ class FANCONTROL
 		int MaxReadErrors;
 		int SecWinUptime;
 		int SlimDialog;
-		int NoBallons;
-		int Hotkeys;
+		int NoBallons,
+			HK_BIOS_Method,
+			HK_Manual_Method,
+			HK_Smart_Method,
+			HK_SM1_Method,
+			HK_SM2_Method,
+			HK_TG_BS_Method,
+			HK_TG_BM_Method,
+			HK_TG_MS_Method,
+			HK_TG_12_Method,
+			HK_BIOS,
+			HK_Manual,
+			HK_Smart,
+			HK_SM1,
+			HK_SM2,
+			HK_TG_BS,
+			HK_TG_BM,
+			HK_TG_MS,
+			HK_TG_12;
 		int BluetoothEDR;
 		int ManModeExit;
 		int ManModeExit2;
@@ -217,6 +235,8 @@ class FANCONTROL
 
 		FANCONTROL(HINSTANCE hinstapp);
 		~FANCONTROL();
+
+		void Test(void);
 
 		int ProcessDialog();
 

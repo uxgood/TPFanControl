@@ -296,6 +296,8 @@ void WorkerThread(void *dummy)
 
 		FANCONTROL fc(hInstApp);
 
+		fc.Test();
+
         g_dialogWnd = fc.GetDialogWnd();
 
 		fc.ProcessDialog();
