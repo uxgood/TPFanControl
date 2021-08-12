@@ -405,10 +405,10 @@
 				>
 			</File>
 		</Filter>
-		<File
+		<!-- <File
 			RelativePath=".\res\xp-manifest.txt"
 			>
-		</File>
+		</File> -->
 	</Files>
 	<Globals>
 	</Globals>

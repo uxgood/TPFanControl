@@ -20,6 +20,7 @@
 #include "fancontrol.h"
 #include "tools.h"
 #include "TVicPort.h"
+#include "ansi.h"
 
 #define TP_ECOFFSET_FAN		 (char)0x2F	// 1 byte (binary xyzz zzz)
 #define TP_ECOFFSET_FANSPEED (char)0x84 // 16 bit word, lo/hi byte
@@ -96,9 +97,9 @@ FANCONTROL::HandleData(void)
 
 	// title string (for minimized window)
 	if(Fahrenheit)
-		sprintf_s(title2,sizeof(title2), "%d°F", this->MaxTemp* 9/5 +32);
+		sprintf_s(title2,sizeof(title2), "%d" ANSI_DEGREE "F", this->MaxTemp* 9/5 +32);
 	else
-		sprintf_s(title2,sizeof(title2), "%d°C", this->MaxTemp);
+		sprintf_s(title2,sizeof(title2), "%d" ANSI_DEGREE "C", this->MaxTemp);
 
 
 	// display fan state
@@ -157,9 +158,9 @@ FANCONTROL::HandleData(void)
 
 	// display temperature list
 	if(Fahrenheit)
-		sprintf_s(obuf2,sizeof(obuf2), "%d°F", this->MaxTemp* 9 /5 +32);
+		sprintf_s(obuf2,sizeof(obuf2), "%d" ANSI_DEGREE "F", this->MaxTemp* 9 /5 +32);
 	else
-		sprintf_s(obuf2,sizeof(obuf2), "%d°C", this->MaxTemp);
+		sprintf_s(obuf2,sizeof(obuf2), "%d" ANSI_DEGREE "C", this->MaxTemp);
 	::SetDlgItemText(this->hwndDialog, 8103, obuf2);
 
 
@@ -170,9 +171,9 @@ FANCONTROL::HandleData(void)
 		if (temp < 128 && temp!= 0) 
 		{
 			if(Fahrenheit)
-				sprintf_s(obuf2,sizeof(obuf2), "%d°F", temp* 9 /5 +32);
+				sprintf_s(obuf2,sizeof(obuf2), "%d" ANSI_DEGREE "F", temp* 9 /5 +32);
 			else
-				sprintf_s(obuf2,sizeof(obuf2), "%d°C", temp);
+				sprintf_s(obuf2,sizeof(obuf2), "%d" ANSI_DEGREE "C", temp);
 
 				if (SlimDialog && StayOnTop)
 					sprintf_s(templist2+strlen(templist2), sizeof(templist2)-strlen(templist2), "%d %s %s", i+1,
@@ -234,9 +235,9 @@ FANCONTROL::HandleData(void)
 	}
 	templist[strlen(templist)-1]= '\0';
 	if (Fahrenheit)
-		sprintf_s(CurrentStatus, sizeof(CurrentStatus), "Fan: 0x%02x / Switch: %d°F (%s)", State.FanCtrl, MaxTemp* 9 /5 +32, templist);
+		sprintf_s(CurrentStatus, sizeof(CurrentStatus), "Fan: 0x%02x / Switch: %d" ANSI_DEGREE "F (%s)", State.FanCtrl, MaxTemp* 9 /5 +32, templist);
 	else 
-		sprintf_s(CurrentStatus, sizeof(CurrentStatus), "Fan: 0x%02x / Switch: %d°C (%s)", State.FanCtrl, MaxTemp, templist);
+		sprintf_s(CurrentStatus, sizeof(CurrentStatus), "Fan: 0x%02x / Switch: %d" ANSI_DEGREE "C (%s)", State.FanCtrl, MaxTemp, templist);
 
 	// display fan speed (experimental, not visible)
     // fanspeed= (this->State.FanSpeedHi << 8) | this->State.FanSpeedLo;
